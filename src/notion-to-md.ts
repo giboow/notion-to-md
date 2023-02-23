@@ -184,20 +184,31 @@ export class NotionToMarkdown {
       case "video":
       case "file":
       case "pdf":
-        {
-          let blockContent;
-          if (type === "video") blockContent = block.video;
-          if (type === "file") blockContent = block.file;
-          if (type === "pdf") blockContent = block.pdf;
-          if (blockContent) {
-            const file_type = blockContent.type;
-            if (file_type === "external")
-              return md.link("image", blockContent.external.url);
-            if (file_type === "file")
-              return md.link("image", blockContent.file.url);
+          {
+              let blockContent;
+              if (type === "video")
+                  blockContent = block.video;
+              if (type === "file")
+                  blockContent = block.file;
+              if (type === "pdf")
+                  blockContent = block.pdf;
+
+              if (blockContent) {
+                  const file_type = blockContent.type;
+                  let link;
+                  if (file_type === "external")
+                      link = blockContent.external.url;
+                  if (file_type === "file")
+                      link = blockContent.file.url;
+
+                  if (link) {
+                      const matches = link.match(/[^\/\\&\?]+\.\w{3,4}(?=([\?&].*$|$))/);
+                      let fileName = matches ? matches[0] : "Image";
+                      return md.link(fileName, link);
+                  }
+              }
           }
-        }
-        break;
+          break;
 
       case "bookmark":
       case "embed":
